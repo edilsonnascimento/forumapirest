@@ -6,12 +6,14 @@ import br.com.nova.forumapirest.modelo.Topico;
 import br.com.nova.forumapirest.repository.CursoRepository;
 import br.com.nova.forumapirest.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.GeneratedValue;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,8 +37,11 @@ public class TopicosController {
     }
 
     @PostMapping
-    public void cadastrar(@RequestBody TopicoForm topicoForm){
+    public ResponseEntity<TopicoDTO> cadastrar(@RequestBody TopicoForm topicoForm, UriComponentsBuilder uriComponentsBuilder){
         Topico topico = topicoForm.converter(cursoRepository);
         topicoRepository.save(topico);
+
+        URI uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+        return ResponseEntity.created(uri).body(new TopicoDTO(topico));
     }
 }
