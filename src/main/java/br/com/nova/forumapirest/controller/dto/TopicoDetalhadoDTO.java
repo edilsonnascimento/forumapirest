@@ -20,7 +20,8 @@ public class TopicoDetalhadoDTO {
 
     public TopicoDetalhadoDTO(Topico topico){
         this.id = topico.getId();
-        this.mensagem = topico.getTitulo();
+        this.titulo = topico.getTitulo();
+        this.mensagem = topico.getMensagem();
         this.dataCriacao = topico.getDataCriacao();
         this.nomeAutor = topico.getAutor().getNome();
         this.status = topico.getStatus();

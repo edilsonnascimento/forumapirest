@@ -2,6 +2,7 @@ package br.com.nova.forumapirest.controller;
 
 import br.com.nova.forumapirest.controller.dto.TopicoDTO;
 import br.com.nova.forumapirest.controller.dto.TopicoDetalhadoDTO;
+import br.com.nova.forumapirest.controller.form.TopicoAtualizacaoForm;
 import br.com.nova.forumapirest.controller.form.TopicoForm;
 import br.com.nova.forumapirest.modelo.Topico;
 import br.com.nova.forumapirest.repository.CursoRepository;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -47,5 +49,15 @@ public class TopicosController {
     public TopicoDetalhadoDTO detalhar(@PathVariable Long id){
         Topico topico = topicoRepository.getOne(id);
         return new TopicoDetalhadoDTO(topico);
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<TopicoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid TopicoAtualizacaoForm form){
+
+        Topico topico = form.atualizar(id, topicoRepository);
+
+        return ResponseEntity.ok(new TopicoDTO(topico));
+
     }
 }
