@@ -1,6 +1,7 @@
 package br.com.nova.forumapirest.controller;
 
 import br.com.nova.forumapirest.config.validacao.security.TokenLocalService;
+import br.com.nova.forumapirest.controller.dto.TokenDto;
 import br.com.nova.forumapirest.controller.form.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AutenticaoController {
 
 
     @PostMapping
-    public ResponseEntity<?> autenticar(@RequestBody @Valid LoginForm form){
+    public ResponseEntity<TokenDto> autenticar(@RequestBody @Valid LoginForm form){
 
         UsernamePasswordAuthenticationToken dadosLogin = form.converter();
 
@@ -36,8 +37,8 @@ public class AutenticaoController {
             Authentication authentication = authenticationManager.authenticate(dadosLogin);
             //Gera o token
             String token = tokenService.gerarToken(authentication);
-            System.out.println(token);
-            return ResponseEntity.ok().build();
+            //Retorna token para o cliente.
+            return ResponseEntity.ok(new TokenDto(token, "Bearer"));
         }catch (AuthenticationException e){
             return ResponseEntity.badRequest().build();
         }
