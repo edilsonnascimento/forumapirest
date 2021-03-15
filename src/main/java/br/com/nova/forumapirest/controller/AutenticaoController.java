@@ -35,10 +35,13 @@ public class AutenticaoController {
         try {
             //faz a autenticação
             Authentication authentication = authenticationManager.authenticate(dadosLogin);
+
             //Gera o token
             String token = tokenService.gerarToken(authentication);
+
             //Retorna token para o cliente.
             return ResponseEntity.ok(new TokenDto(token, "Bearer"));
+
         }catch (AuthenticationException e){
             return ResponseEntity.badRequest().build();
         }
