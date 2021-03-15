@@ -16,7 +16,7 @@ public class TokenLocalService {
     private String expiration;
 
     @Value("${forum.jwt.secret}")
-    private String senha;
+    private String secret;
 
     public String gerarToken(Authentication authentication) {
 
@@ -29,7 +29,19 @@ public class TokenLocalService {
                 .setSubject(logado.getId().toString())  //Dono do token
                 .setIssuedAt(hoje)                      //Data de geração do Token
                 .setExpiration(dataExpiracao)           //Data de expiração
-                .signWith(SignatureAlgorithm.HS256, senha) //Criptografar senha
+                .signWith(SignatureAlgorithm.HS256, secret) //Criptografar senha
                 .compact();                             //Transforma tudo em uma string.
+    }
+
+    public boolean isTokenValido(String token) {
+
+        try {
+            Jwts.parser()                             //Faz discriptografa o token e valida
+                    .setSigningKey(this.secret)       //Chave para descriptografar.
+                    .parseClaimsJws(token);           //Devolve um objeto com o token válido senão retorna uma Exception
+        }catch (Exception e){
+            return false;
+        }
+        return true;
     }
 }

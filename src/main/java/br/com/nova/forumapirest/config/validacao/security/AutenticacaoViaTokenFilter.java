@@ -1,5 +1,6 @@
 package br.com.nova.forumapirest.config.validacao.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -10,12 +11,22 @@ import java.io.IOException;
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
+
+    private TokenLocalService tokenService;
+
+    public AutenticacaoViaTokenFilter(TokenLocalService tokenService) {
+        this.tokenService = tokenService;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
 
         String token = recupearToken(httpServletRequest);
 
-        System.out.println(token);
+        boolean valido = tokenService.isTokenValido(token);
+
+        System.out.println(valido);
+
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
