@@ -1,6 +1,9 @@
 package br.com.nova.forumapirest.config.validacao.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.nova.forumapirest.modelo.Usuario;
+import br.com.nova.forumapirest.repository.UsuarioRepository;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -14,8 +17,11 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
     private TokenLocalService tokenService;
 
-    public AutenticacaoViaTokenFilter(TokenLocalService tokenService) {
+    private UsuarioRepository usuarioRepository;
+
+    public AutenticacaoViaTokenFilter(TokenLocalService tokenService, UsuarioRepository usuarioRepository) {
         this.tokenService = tokenService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -23,11 +29,19 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
         String token = recupearToken(httpServletRequest);
 
-        boolean valido = tokenService.isTokenValido(token);
-
-        System.out.println(valido);
+        //valido conforme chave mestre(secret)
+        if(tokenService.isTokenValido(token)){
+            autenticarCliente(token);
+        }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
+    }
+
+    private void autenticarCliente(String token) {
+        Long idUsuario = tokenService.getIdUsuario(token); //recebe o id do usuário que está no token.
+        Usuario usuario = usuarioRepository.findById(idUsuario).get(); // recebe do repositorio objeto inserido na contrução do objeto AutenticacaoViaTokenFilter.
+        UsernamePasswordAuthenticationToken autentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities()); //tem as informações do usuário autenticado.
+        SecurityContextHolder.getContext().setAuthentication(autentication); //usário está autenticado.
     }
 
     private String recupearToken(HttpServletRequest httpServletRequest) {

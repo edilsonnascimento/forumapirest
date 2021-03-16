@@ -1,6 +1,7 @@
 package br.com.nova.forumapirest.config.validacao.security;
 
 import br.com.nova.forumapirest.modelo.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,5 +44,13 @@ public class TokenLocalService {
             return false;
         }
         return true;
+    }
+
+    public Long getIdUsuario(String token) {
+        Claims claims = Jwts.parser()              //Faz discriptografa o token e valida
+                .setSigningKey(this.secret)       //Chave para descriptografar.
+                .parseClaimsJws(token)           //Devolve um objeto com o token válido senão retorna uma Exception.
+                .getBody();                      //conteúdo do token.
+        return Long.parseLong(claims.getSubject());
     }
 }
